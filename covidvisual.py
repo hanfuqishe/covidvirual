@@ -3,10 +3,8 @@
 import requests
 import json
 import tempfile
-import csv
 import os
 import shutil
-import pandas as pd
 import xlsxwriter
 import webbrowser
 import time
@@ -318,4 +316,4 @@ try:
     
 except:
     print("The returned data is not as expected. ")
-    raise
+    #raise
