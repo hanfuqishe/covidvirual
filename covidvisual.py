@@ -284,7 +284,8 @@ try:
     ##############################################################################################
     # Save data of Chinese Provinces
     ##############################################################################################
-    WorkBookChina = CreateWorkbook('epidemic-%s-China.xlsx'%(date.today().strftime('%Y%m%d')))
+    #WorkBookChina = CreateWorkbook('epidemic-%s-China.xlsx'%(date.today().strftime('%Y%m%d')))
+    WorkBookChina = CreateWorkbook('epidemic-China.xlsx')
     Provinces = WorldDict['ncov_nation_data']['provinces']
     AddToSheet(WorkBook=WorkBookChina, SheetName='China',  Series = WorldDict['ncov_nation_data']['nationwide'])
     for Province in Provinces:
@@ -297,7 +298,8 @@ try:
     ##############################################################################################
     # Save data of World and China
     ##############################################################################################
-    WorkBookWorld = CreateWorkbook('epidemic-%s-Global.xlsx'%(date.today().strftime('%Y%m%d')))
+    #WorkBookWorld = CreateWorkbook('epidemic-%s-Global.xlsx'%(date.today().strftime('%Y%m%d')))
+    WorkBookWorld = CreateWorkbook('epidemic-Global.xlsx')
     ProcessOverallToXlsx(WorkBookWorld, WorldDict['overseas_data']['country'])
 
     AddToSheet(SheetName='World', WorkBook=WorkBookWorld,  Series = WorldDict['overseas_data']['series'])
