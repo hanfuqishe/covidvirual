@@ -12,6 +12,7 @@ import codecs
 from datetime import date
 
 ToSaveJson = False
+AutoOpen   = True
 
 TempDir=os.path.join(tempfile.gettempdir(), 'covid')
 
@@ -152,7 +153,9 @@ def AddToSheet(Series, WorkBook, SheetName):
     Chart.set_y_axis ({'log_base':10})
     Chart.set_y2_axis({'num_format': '0%', 'min':0, 'max':1})
 
-    for ColIndex in range(ord('E'), ord('K')): 
+    print('add chart col:', end='')
+    for ColIndex in [ord('B')] + list(range(ord('E'), ord('K'))): 
+        print(chr(ColIndex), end=".")
         AddSeries(Chart, SheetName, chr(ColIndex), XlsMaxRow, Y2Axis = (ColIndex >= ord('I')))
 
     ChartSheet = WorkBook.add_chartsheet('%s▲'%(SheetName))
@@ -171,9 +174,12 @@ def CloseAndBrowse(WorkBook: xlsxwriter.Workbook):
 
         print("OK. Time elapsed: ", time.strftime('%M:%S', time.localtime(ticks)), flush=True)
 
-        print("Opening Excel file ... ", end='')
-        webbrowser.open(WorkBook.filename)
-        print('OK.\n')
+        if AutoOpen: 
+            print("Opening Excel file ... ", end='')
+            webbrowser.open(WorkBook.filename)
+            print('OK.')
+
+        print("\n")
     except:
         # raise
         print("failed. File already opened?\n")
