@@ -205,7 +205,7 @@ def ProcessOverallToXlsx(WorkBook, CountriesData):
     AsPercent2 = WorkBook.add_format({'font_name': 'calibri', 'num_format': '0.00%'})
     AsNumber   = WorkBook.add_format({'font_name': 'calibri', 'num_format': '#,##0_ '})
 
-    WorkSheet = WorkBook.add_worksheet('OverAll')
+    WorkSheet = WorkBook.add_worksheet('总览')
     WorkSheet.set_column('B:B', 12)
     WorkSheet.set_column('U:U', 12)
 
@@ -303,7 +303,7 @@ try:
     #WorkBookChina = CreateWorkbook('epidemic-%s-China.xlsx'%(date.today().strftime('%Y%m%d')))
     WorkBookChina = CreateWorkbook('epidemic-China.xlsx')
     Provinces = WorldDict['ncov_nation_data']['provinces']
-    AddToSheet(WorkBook=WorkBookChina, SheetName='China',  Series = WorldDict['ncov_nation_data']['nationwide'])
+    AddToSheet(WorkBook=WorkBookChina, SheetName='全国',  Series = WorldDict['ncov_nation_data']['nationwide'])
     for Province in Provinces:
         AddToSheet(WorkBook=WorkBookChina, SheetName=Province['name'], Series= Province['series'])
 
@@ -318,8 +318,8 @@ try:
     WorkBookWorld = CreateWorkbook('epidemic-Global.xlsx')
     ProcessOverallToXlsx(WorkBookWorld, WorldDict['overseas_data']['country'])
 
-    AddToSheet(SheetName='World', WorkBook=WorkBookWorld,  Series = WorldDict['overseas_data']['series'])
-    AddToSheet(SheetName='China', WorkBook=WorkBookWorld,  Series = WorldDict['ncov_nation_data']['nationwide'])
+    AddToSheet(SheetName='全球', WorkBook=WorkBookWorld,  Series = WorldDict['overseas_data']['series'])
+    AddToSheet(SheetName='中国', WorkBook=WorkBookWorld,  Series = WorldDict['ncov_nation_data']['nationwide'])
 
     # Fetch and save data of all foreign countries in the world
     Countries = WorldDict["ncov_nation_data"]["world"]
