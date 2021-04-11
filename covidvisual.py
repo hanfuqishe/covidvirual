@@ -153,9 +153,9 @@ def AddToSheet(Series, WorkBook, SheetName):
     Chart.set_y_axis ({'log_base':10})
     Chart.set_y2_axis({'num_format': '0%', 'min':0, 'max':1})
 
-    print('add chart col:', end='')
+    print('add chart ... ', end='')
     for ColIndex in [ord('B')] + list(range(ord('E'), ord('K'))): 
-        print(chr(ColIndex), end=".")
+        # print(chr(ColIndex), end=".")
         AddSeries(Chart, SheetName, chr(ColIndex), XlsMaxRow, Y2Axis = (ColIndex >= ord('I')))
 
     ChartSheet = WorkBook.add_chartsheet('%s▲'%(SheetName))
@@ -172,10 +172,11 @@ def CloseAndBrowse(WorkBook: xlsxwriter.Workbook):
         WorkBook.close()
         ticks = time.time() - ticks 
 
-        print("OK. Time elapsed: ", time.strftime('%M:%S', time.localtime(ticks)), flush=True)
+        # print("OK. Time elapsed: ", time.strftime('%M:%S', time.localtime(ticks)), flush=True)
+        print("OK. Time elapsed: %0.3f seconds"% (ticks), flush=True)
 
         if AutoOpen: 
-            print("Opening Excel file ... ", end='')
+            print("Opening Excel file ... ", end='', flush=True)
             webbrowser.open(WorkBook.filename)
             print('OK.')
 
