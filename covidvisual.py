@@ -3,7 +3,7 @@
 import requests
 import json
 import tempfile
-import os
+import os, sys, getopt
 import shutil
 import xlsxwriter
 import webbrowser
@@ -12,7 +12,8 @@ import codecs
 from datetime import date
 
 ToSaveJson = False
-AutoOpen   = True
+AutoOpenChina  = False
+AutoOpenGlobal = False
 
 TempDir=os.path.join(tempfile.gettempdir(), 'covid')
 
@@ -164,7 +165,7 @@ def AddToSheet(Series, WorkBook, SheetName):
     print('OK.')
 
 
-def CloseAndBrowse(WorkBook: xlsxwriter.Workbook):
+def CloseAndBrowse(WorkBook: xlsxwriter.Workbook, AutoOpen):
     try:
         print("\nSaving file [%s] ... "%(WorkBook.filename), end='')
 
@@ -275,6 +276,27 @@ def ProcessOverallToXlsx(WorkBook, CountriesData):
     
 
 # Entry starts here
+
+try:
+    argv = sys.argv[1:]
+    opts, args = getopt.getopt(argv,"hcg")
+except getopt.GetoptError:
+    print('covidspider.py [-c] [-g]')
+    print('\t-c\tOpen epidemic xlsx file of China automaticlly after finished.')
+    print('\t-g\tOpen epidemic xlsx file of Global automaticlly after finished.')
+    sys.exit(2)
+for opt, arg in opts:
+    if opt == '-h':
+        print('covidspider.py [-c] [-g]')
+        print('\t-c\tOpen epidemic xlsx file of China automaticlly after finished.')
+        print('\t-g\tOpen epidemic xlsx file of Global automaticlly after finished.')
+        sys.exit()
+    elif opt == '-c':
+        AutoOpenChina = True
+    elif opt == '-g':
+        AutoOpenGlobal = True
+
+
 QueryWorldDataUrl ='https://i.snssdk.com/forum/ncov_data/?data_type=[2,4,8]'
 
 print('Fetching Global and China data ... ', end='')
@@ -308,7 +330,7 @@ try:
     for Province in Provinces:
         AddToSheet(WorkBook=WorkBookChina, SheetName=Province['name'], Series= Province['series'])
 
-    CloseAndBrowse(WorkBookChina)
+    CloseAndBrowse(WorkBookChina, AutoOpen = AutoOpenChina)
     ##############################################################################################
 
 
@@ -325,12 +347,13 @@ try:
     # Fetch and save data of all foreign countries in the world
     Countries = WorldDict["ncov_nation_data"]["world"]
     i = 1;  CountriesCount = len(Countries)
+    ticks0 = time.time()
 
     for Country in Countries:  # array of dicts of countries
-        print("%0.1f%%"%(i*100/CountriesCount), end='\t'); i += 1
+        print("%0.2fs\t%0.1f%%"%(time.time()-ticks0, i*100/CountriesCount), end='\t'); i += 1
         FetchCountryData(WorkBook= WorkBookWorld,ID = Country['id'], Name = Country['name'])
 
-    CloseAndBrowse(WorkBookWorld)
+    CloseAndBrowse(WorkBookWorld, AutoOpen = AutoOpenGlobal)
     ##############################################################################################
     
 except:
