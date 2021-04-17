@@ -265,11 +265,11 @@ def ProcessOverallToXlsx(WorkBook, CountriesData):
                         {'header': '新增死亡'},             # o 
                         {'header': '新增治疗'},             # p 
                         {'header': '感染率'},               # q 
-                        {'header': '总治愈率'},             # r 
-                        {'header': '总死亡率'},             # s 
-                        {'header': '国民总人口'},             # s 
-                        {'header': '国民死亡率'},             # s 
-                        {'header': '更新时间'},             # u
+                        {'header': '患者治愈率'},           # r 
+                        {'header': '患者死亡率'},           # s 
+                        {'header': '国民总人口'},           # t 
+                        {'header': '国民死亡率'},           # u 
+                        {'header': '更新时间'},             # v
                     ]
             }
         )
