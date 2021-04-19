@@ -94,7 +94,7 @@ def AddToSheet(Series, WorkBook, SheetName):
 
     # SortedSeries = sorted(Series, key = lambda e:(e.__getitem__('date'))) # list of dict. Here are the detailed data we wanted
 
-    print('add to Sheet:[%s]!%s ... '%(WorkBook.filename, SheetName), end='')
+    print('add to Sheet:[%s]!%s ... '%(WorkBook.filename, SheetName), end='', flush=True)
 
     AsDate    = WorkBook.add_format({'font_name': 'calibri', 'num_format': 'yyyy-mm-dd'})
     AsNumber  = WorkBook.add_format({'font_name': 'calibri', 'num_format': '#,##0_ '})
@@ -154,7 +154,7 @@ def AddToSheet(Series, WorkBook, SheetName):
     Chart.set_y_axis ({'log_base':10})
     Chart.set_y2_axis({'num_format': '0%', 'min':0, 'max':1})
 
-    print('add chart ... ', end='')
+    print('add chart ... ', end='', flush=True)
     for ColIndex in [ord('B')] + list(range(ord('E'), ord('K'))): 
         # print(chr(ColIndex), end=".")
         AddSeries(Chart, SheetName, chr(ColIndex), XlsMaxRow, Y2Axis = (ColIndex >= ord('I')))
@@ -216,7 +216,7 @@ def ProcessOverallToXlsx(WorkBook, CountriesData):
     for Country in CountriesData:
         Col = -1
         Col += 1; WorkSheet.write(DestRow, Col,       Country['continent'], AsString)
-        Col += 1; WorkSheet.write(DestRow, Col,       Country['name'], AsString)
+        Col += 1; WorkSheet.write_url(DestRow, Col,   'internal:' + Country['name'] + '!A1', string=Country['name'])
         Col += 1; WorkSheet.write(DestRow, Col,       Country['id'], AsString)
         Col += 1; WorkSheet.write(DestRow, Col,       Country['countryTotal']['confirmedTotal'], AsNumber)
         Col += 1; WorkSheet.write(DestRow, Col,       Country['countryTotal']['suspectedTotal'], AsNumber)
@@ -299,7 +299,7 @@ for opt, arg in opts:
 
 QueryWorldDataUrl ='https://i.snssdk.com/forum/ncov_data/?data_type=[2,4,8]'
 
-print('Fetching Global and China data ... ', end='')
+print('Fetching Global and China data ... ', end='', flush=True)
 
 r = requests.get(url=QueryWorldDataUrl)
 if r.status_code == 200:
