@@ -39,7 +39,7 @@ def FetchCountryData(ID, Name, WorkBook):
     QueryCountryFmtStr='https://i.snssdk.com/forum/ncov_data/?country_id=["%s"]&country_name=%s&click_from=overseas_epidemic_tab_list&data_type=[5,4]&policy_scene=%s&src_type=country'
     Url = QueryCountryFmtStr%(ID, Name, ID)
 
-    print('Fetching data ... ', end='')
+    print('Fetching data ... ', end='', flush=True)
 
     r = requests.get(Url)
     if r.status_code == 200:
