@@ -215,29 +215,28 @@ def ProcessOverallToXlsx(WorkBook, CountriesData):
 
     for Country in CountriesData:
         Col = -1
-        Col += 1; WorkSheet.write(DestRow, Col,       Country['continent'], AsString)
-        Col += 1; WorkSheet.write_url(DestRow, Col,   'internal:' + Country['name'] + '!A1', string=Country['name'])
-        Col += 1; WorkSheet.write(DestRow, Col,       Country['id'], AsString)
-        Col += 1; WorkSheet.write(DestRow, Col,       Country['countryTotal']['confirmedTotal'], AsNumber)
-        Col += 1; WorkSheet.write(DestRow, Col,       Country['countryTotal']['suspectedTotal'], AsNumber)
-        Col += 1; WorkSheet.write(DestRow, Col,       Country['countryTotal']['curesTotal'], AsNumber)
-        Col += 1; WorkSheet.write(DestRow, Col,       Country['countryTotal']['deathsTotal'], AsNumber)
-        Col += 1; WorkSheet.write(DestRow, Col,       Country['countryTotal']['treatingTotal'], AsNumber)
-        Col += 1; WorkSheet.write(DestRow, Col,       Country['countryTotal']['inboundTotal'], AsNumber)
-        Col += 1; WorkSheet.write(DestRow, Col,       Country['countryTotal']['asymptomaticTotal'], AsNumber)
-        Col += 1; WorkSheet.write(DestRow, Col, float(Country['countryTotal']['deathRatio'].strip('%'))/100, AsPercent1)
-        Col += 1; WorkSheet.write(DestRow, Col, float(Country['countryTotal']['curesRatio'].strip('%'))/100, AsPercent1)
-        Col += 1; WorkSheet.write(DestRow, Col,       Country['countryIncr']['confirmedIncr'], AsNumber)
-        Col += 1; WorkSheet.write(DestRow, Col,       Country['countryIncr']['suspectedIncr'], AsNumber)
-        Col += 1; WorkSheet.write(DestRow, Col,       Country['countryIncr']['curesIncr'], AsNumber)
-        Col += 1; WorkSheet.write(DestRow, Col,       Country['countryIncr']['deathsIncr'], AsNumber)
-        Col += 1; WorkSheet.write(DestRow, Col,       Country['countryIncr']['treatingIncr'], AsNumber)
-        Col += 1; WorkSheet.write(DestRow, Col, float(Country['confirmedPerMil'])/1000000, AsPercent1)
-
-        Col += 1; WorkSheet.write(DestRow, Col, '=F%d/(F%d+G%d)' % (DestRow + 1, DestRow + 1, DestRow + 1), AsPercent1)   # 总治愈率
-        Col += 1; WorkSheet.write(DestRow, Col, '=1-S%d'         % (DestRow + 1), AsPercent2)                             # 总死亡率
-        Col += 1; WorkSheet.write(DestRow, Col, '=D%d/R%d'       % (DestRow +1, DestRow + 1), AsNumber)                  # 国民总人口
-        Col += 1; WorkSheet.write(DestRow, Col, '=K%d*R%d'       % (DestRow +1, DestRow + 1), AsPercent2)                # 国民死亡率
+        Col += 1; WorkSheet.write    (DestRow, Col,       Country['continent'], AsString)
+        Col += 1; WorkSheet.write_url(DestRow, Col,       'internal:' + Country['name'] + '!A1', string=Country['name'])
+        Col += 1; WorkSheet.write    (DestRow, Col,       Country['id'], AsString)
+        Col += 1; WorkSheet.write    (DestRow, Col,       Country['countryTotal']['confirmedTotal'], AsNumber)
+        Col += 1; WorkSheet.write    (DestRow, Col,       Country['countryTotal']['suspectedTotal'], AsNumber)
+        Col += 1; WorkSheet.write    (DestRow, Col,       Country['countryTotal']['curesTotal'], AsNumber)
+        Col += 1; WorkSheet.write    (DestRow, Col,       Country['countryTotal']['deathsTotal'], AsNumber)
+        Col += 1; WorkSheet.write    (DestRow, Col,       Country['countryTotal']['treatingTotal'], AsNumber)
+        Col += 1; WorkSheet.write    (DestRow, Col,       Country['countryTotal']['inboundTotal'], AsNumber)
+        Col += 1; WorkSheet.write    (DestRow, Col,       Country['countryTotal']['asymptomaticTotal'], AsNumber)
+        Col += 1; WorkSheet.write    (DestRow, Col, float(Country['countryTotal']['deathRatio'].strip('%'))/100, AsPercent1)
+        Col += 1; WorkSheet.write    (DestRow, Col, float(Country['countryTotal']['curesRatio'].strip('%'))/100, AsPercent1)
+        Col += 1; WorkSheet.write    (DestRow, Col,       Country['countryIncr']['confirmedIncr'], AsNumber)
+        Col += 1; WorkSheet.write    (DestRow, Col,       Country['countryIncr']['suspectedIncr'], AsNumber)
+        Col += 1; WorkSheet.write    (DestRow, Col,       Country['countryIncr']['curesIncr'], AsNumber)
+        Col += 1; WorkSheet.write    (DestRow, Col,       Country['countryIncr']['deathsIncr'], AsNumber)
+        Col += 1; WorkSheet.write    (DestRow, Col,       Country['countryIncr']['treatingIncr'], AsNumber)
+        Col += 1; WorkSheet.write    (DestRow, Col, float(Country['confirmedPerMil'])/1000000, AsPercent1)
+        Col += 1; WorkSheet.write    (DestRow, Col, '=F%d/(F%d+G%d)' % (DestRow + 1, DestRow + 1, DestRow + 1), AsPercent1)   # 总治愈率
+        Col += 1; WorkSheet.write    (DestRow, Col, '=1-S%d'         % (DestRow + 1), AsPercent2)                             # 总死亡率
+        Col += 1; WorkSheet.write    (DestRow, Col, '=D%d/R%d'       % (DestRow +1, DestRow + 1), AsNumber)                  # 国民总人口
+        Col += 1; WorkSheet.write    (DestRow, Col, '=K%d*R%d'       % (DestRow +1, DestRow + 1), AsPercent2)                # 国民死亡率
 
         Col += 1; WorkSheet.write(DestRow, Col, time.strftime('%Y-%m-%d', time.localtime(Country['updateTime'])), AsDate)
 
