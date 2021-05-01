@@ -11,9 +11,11 @@ import time
 import codecs
 from datetime import date
 
-ToSaveJson = False
-AutoOpenChina  = False
-AutoOpenGlobal = False
+SmoothDays      = 1
+AutoOpenChina   = False
+AutoOpenGlobal  = False
+Debugging       = False
+ToSaveJson      = False
 
 TempDir=os.path.join(tempfile.gettempdir(), 'covid')
 
@@ -113,19 +115,25 @@ def AddToSheet(Series, WorkBook, SheetName):
             Yestoday = Today
 
             DestRow += 1
-            XlsAboveRow   = DestRow
-            XlsCurrentRow = XlsAboveRow + 1  # xlsxwriter count from 0, while Excel count from 1. Add 1 to represent current line while writing as content
+            XlsCurrentRow = DestRow + 1  # xlsxwriter count from 0, while Excel count from 1. Add 1 to represent current line while writing as content
+            XlsAboveRow   = XlsCurrentRow - SmoothDays
 
             Col  = 0; WorkSheet.write_datetime(DestRow, Col, date.fromisoformat(Item['date']), AsDate)                                          # A - Date
             Col += 1; WorkSheet.write_row(DestRow, Col, Yestoday, AsNumber)                                                                     # B - Confirmed Number,  C - Death Number, D - Cured Number, E - Treating Number
-            Col += 4; WorkSheet.write(DestRow, Col, '=IFERROR(B%d-B%d, "")'      % (XlsCurrentRow, XlsAboveRow), AsNumber)                      # F - Daily Confirmed
-            Col += 1; WorkSheet.write(DestRow, Col, '=IFERROR(C%d-C%d, "")'      % (XlsCurrentRow, XlsAboveRow), AsNumber)                      # G - Daily Death
-            Col += 1; WorkSheet.write(DestRow, Col, '=IFERROR(D%d-D%d, "")'      % (XlsCurrentRow, XlsAboveRow), AsNumber)                      # H - Daily Cured
+            Col += 4; 
+            if XlsAboveRow > 0:  
+                WorkSheet.write(DestRow, Col, '=IFERROR((B%d-B%d)/%d, "")'   % (XlsCurrentRow, XlsAboveRow, SmoothDays), AsNumber)                      # F - Daily Confirmed
+            Col += 1; 
+            if XlsAboveRow > 0:  
+                WorkSheet.write(DestRow, Col, '=IFERROR((C%d-C%d)/%d, "")'   % (XlsCurrentRow, XlsAboveRow, SmoothDays), AsNumber)                      # G - Daily Death
+            Col += 1; 
+            if XlsAboveRow > 0:  
+                WorkSheet.write(DestRow, Col, '=IFERROR((D%d-D%d)/%d, "")'   % (XlsCurrentRow, XlsAboveRow, SmoothDays), AsNumber)                      # H - Daily Cured
             Col += 1; WorkSheet.write(DestRow, Col, '=IFERROR(G%d/(G%d+H%d), "")'% (XlsCurrentRow, XlsCurrentRow, XlsCurrentRow), AsPercent)    # I - Daily mortality
             Col += 1; WorkSheet.write(DestRow, Col, '=IFERROR(C%d/(C%d+D%d), "")'% (XlsCurrentRow, XlsCurrentRow, XlsCurrentRow), AsPercent)    # J - Overall mortality
             Col += 1; WorkSheet.write(DestRow, Col, '=IFERROR(C%d/B%d, "")'      % (XlsCurrentRow, XlsCurrentRow), AsPercent)                   # K - Mortality by Media
 
-            XlsMaxRow = DestRow + 1
+    XlsMaxRow = DestRow + 1
 
     WorkSheet.add_table(
         "A1:K%d"%(XlsMaxRow),  {
@@ -137,10 +145,10 @@ def AddToSheet(Series, WorkBook, SheetName):
                     {'header': '死亡'},                                 # C
                     {'header': '治愈'},                                 # D
                     {'header': '现有确诊\nTreating'},                   # E
-                    {'header': '新增确诊\nNewly diagnosed'},            # F
-                    {'header': '新增死亡\nNewly Death'},                # G
-                    {'header': '新增治愈\nNewly Cured'},                # H
-                    {'header': '当日死亡率\nDaily mortality'},          # I
+                    {'header': '%d日平均新增确诊\nNewly diagnosed'%(SmoothDays)},   # F
+                    {'header': '%d日平均新增死亡\nNewly Death'%(SmoothDays)},       # G
+                    {'header': '%d日平均新增治愈\nNewly Cured'%(SmoothDays)},       # H
+                    {'header': '%d日平均死亡率\nDaily mortality'%(SmoothDays)},     # I
                     {'header': '总体死亡率\nOverall mortality'},        # J 
                     {'header': '死亡率by媒体\nMortality by Media'},     # k 
                 ]
@@ -274,26 +282,33 @@ def ProcessOverallToXlsx(WorkBook, CountriesData):
         )
     
 
+def print_usage():
+    print('covidspider.py [-c] [-d] [-g]')
+    print('    -c\t\tOpen epidemic xlsx file of China automaticlly after finished.')
+    print('    -d days\tSmooth the comfirmed number by days.')
+    print('    -g\t\tOpen epidemic xlsx file of Global automaticlly after finished.')
+
 # Entry starts here
 
 try:
     argv = sys.argv[1:]
-    opts, args = getopt.getopt(argv,"hcg")
+    opts, args = getopt.getopt(argv,"hcd:g")
 except getopt.GetoptError:
-    print('covidspider.py [-c] [-g]')
-    print('\t-c\tOpen epidemic xlsx file of China automaticlly after finished.')
-    print('\t-g\tOpen epidemic xlsx file of Global automaticlly after finished.')
+    print_usage()
     sys.exit(2)
 for opt, arg in opts:
     if opt == '-h':
-        print('covidspider.py [-c] [-g]')
-        print('\t-c\tOpen epidemic xlsx file of China automaticlly after finished.')
-        print('\t-g\tOpen epidemic xlsx file of Global automaticlly after finished.')
-        sys.exit()
+        print_usage()
+        sys.exit(0)
     elif opt == '-c':
         AutoOpenChina = True
     elif opt == '-g':
         AutoOpenGlobal = True
+    elif opt == '-d':
+        SmoothDays = int(arg)
+        if SmoothDays < 1:
+            print("Error: Days must > 0")
+            sys.exit(2)
 
 
 QueryWorldDataUrl ='https://i.snssdk.com/forum/ncov_data/?data_type=[2,4,8]'
@@ -351,6 +366,8 @@ try:
     for Country in Countries:  # array of dicts of countries
         print("%0.2fs\t%0.1f%%"%(time.time()-ticks0, i*100/CountriesCount), end='\t'); i += 1
         FetchCountryData(WorkBook= WorkBookWorld,ID = Country['id'], Name = Country['name'])
+        if Debugging:
+            break
 
     CloseAndBrowse(WorkBookWorld, AutoOpen = AutoOpenGlobal)
     ##############################################################################################
