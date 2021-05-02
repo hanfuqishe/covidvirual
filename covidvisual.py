@@ -98,9 +98,10 @@ def AddToSheet(Series, WorkBook, SheetName):
 
     print('add to Sheet:[%s]!%s ... '%(WorkBook.filename, SheetName), end='', flush=True)
 
-    AsDate    = WorkBook.add_format({'font_name': 'calibri', 'num_format': 'yyyy-mm-dd'})
-    AsNumber  = WorkBook.add_format({'font_name': 'calibri', 'num_format': '#,##0_ '})
-    AsPercent = WorkBook.add_format({'font_name': 'calibri', 'num_format': '0.0%'})
+    AsDate        = WorkBook.add_format({'font_name': 'calibri', 'num_format': 'yyyy-mm-dd'})
+    AsNumber      = WorkBook.add_format({'font_name': 'calibri', 'num_format': '#,##0_ '})
+    AsBoldNumber  = WorkBook.add_format({'font_name': 'calibri', 'font_color': '#D00000', 'bold': False, 'num_format': '#,##0_ '})
+    AsPercent     = WorkBook.add_format({'font_name': 'calibri', 'num_format': '0.0%'})
 
     WorkSheet = WorkBook.add_worksheet(SheetName)
 
@@ -122,13 +123,13 @@ def AddToSheet(Series, WorkBook, SheetName):
             Col += 1; WorkSheet.write_row(DestRow, Col, Yestoday, AsNumber)                                                                     # B - Confirmed Number,  C - Death Number, D - Cured Number, E - Treating Number
             Col += 4; 
             if XlsAboveRow > 0:  
-                WorkSheet.write(DestRow, Col, '=IFERROR((B%d-B%d)/%d, "")'   % (XlsCurrentRow, XlsAboveRow, SmoothDays), AsNumber)                      # F - Daily Confirmed
+                WorkSheet.write(DestRow, Col, '=IFERROR((B%d-B%d)/%d, "")'   % (XlsCurrentRow, XlsAboveRow, SmoothDays), AsBoldNumber)          # F - Daily Confirmed
             Col += 1; 
             if XlsAboveRow > 0:  
-                WorkSheet.write(DestRow, Col, '=IFERROR((C%d-C%d)/%d, "")'   % (XlsCurrentRow, XlsAboveRow, SmoothDays), AsNumber)                      # G - Daily Death
+                WorkSheet.write(DestRow, Col, '=IFERROR((C%d-C%d)/%d, "")'   % (XlsCurrentRow, XlsAboveRow, SmoothDays), AsNumber)              # G - Daily Death
             Col += 1; 
             if XlsAboveRow > 0:  
-                WorkSheet.write(DestRow, Col, '=IFERROR((D%d-D%d)/%d, "")'   % (XlsCurrentRow, XlsAboveRow, SmoothDays), AsNumber)                      # H - Daily Cured
+                WorkSheet.write(DestRow, Col, '=IFERROR((D%d-D%d)/%d, "")'   % (XlsCurrentRow, XlsAboveRow, SmoothDays), AsNumber)              # H - Daily Cured
             Col += 1; WorkSheet.write(DestRow, Col, '=IFERROR(G%d/(G%d+H%d), "")'% (XlsCurrentRow, XlsCurrentRow, XlsCurrentRow), AsPercent)    # I - Daily mortality
             Col += 1; WorkSheet.write(DestRow, Col, '=IFERROR(C%d/(C%d+D%d), "")'% (XlsCurrentRow, XlsCurrentRow, XlsCurrentRow), AsPercent)    # J - Overall mortality
             Col += 1; WorkSheet.write(DestRow, Col, '=IFERROR(C%d/B%d, "")'      % (XlsCurrentRow, XlsCurrentRow), AsPercent)                   # K - Mortality by Media
@@ -284,15 +285,15 @@ def ProcessOverallToXlsx(WorkBook, CountriesData):
 
 def print_usage():
     print('covidspider.py [-c] [-d] [-g]')
+    print('    -a days\tAverage days. Smooth the comfirmed number by several days.')
     print('    -c\t\tOpen epidemic xlsx file of China automaticlly after finished.')
-    print('    -d days\tSmooth the comfirmed number by days.')
     print('    -g\t\tOpen epidemic xlsx file of Global automaticlly after finished.')
 
 # Entry starts here
 
 try:
     argv = sys.argv[1:]
-    opts, args = getopt.getopt(argv,"hcd:g")
+    opts, args = getopt.getopt(argv,"a:hcdg")
 except getopt.GetoptError:
     print_usage()
     sys.exit(2)
@@ -305,6 +306,8 @@ for opt, arg in opts:
     elif opt == '-g':
         AutoOpenGlobal = True
     elif opt == '-d':
+        Debugging = True
+    elif opt == '-a':
         SmoothDays = int(arg)
         if SmoothDays < 1:
             print("Error: Days must > 0")
