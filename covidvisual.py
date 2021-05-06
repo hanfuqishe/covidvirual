@@ -41,7 +41,7 @@ def FetchCountryData(ID, Name, WorkBook):
     QueryCountryFmtStr='https://i.snssdk.com/forum/ncov_data/?country_id=["%s"]&country_name=%s&click_from=overseas_epidemic_tab_list&data_type=[5,4]&policy_scene=%s&src_type=country'
     Url = QueryCountryFmtStr%(ID, Name, ID)
 
-    print('Fetching data ... ', end='', flush=True)
+    print('Fetching ... ', end='', flush=True)
 
     r = requests.get(Url)
     if r.status_code == 200:
@@ -96,7 +96,7 @@ def AddToSheet(Series, WorkBook, SheetName):
 
     # SortedSeries = sorted(Series, key = lambda e:(e.__getitem__('date'))) # list of dict. Here are the detailed data we wanted
 
-    print('add to Sheet:[%s]!%s ... '%(WorkBook.filename, SheetName), end='', flush=True)
+    print('add Sheet:[%s]!%s ... '%(WorkBook.filename, SheetName), end='', flush=True)
 
     AsDate        = WorkBook.add_format({'font_name': 'calibri', 'num_format': 'yyyy-mm-dd'})
     AsNumber      = WorkBook.add_format({'font_name': 'calibri', 'num_format': '#,##0_ '})
@@ -111,7 +111,8 @@ def AddToSheet(Series, WorkBook, SheetName):
 
     for Item in reversed(Series):
         Today = (Item['confirmedNum'], Item['deathsNum'], Item['curesNum'], Item['treatingNum'])
-        if (Today != Yestoday) | (Today[3] != 0):
+        #if (Today != Yestoday) | (Today[3] != 0):
+        if  True :
 
             Yestoday = Today
 
@@ -314,8 +315,16 @@ for opt, arg in opts:
             sys.exit(2)
 
 
-QueryWorldDataUrl ='https://i.snssdk.com/forum/ncov_data/?data_type=[2,4,8]'
 
+if SmoothDays > 1:
+    filename_china  = 'epidemic-%s-%dDsmoothy-China.xlsx'%(date.today().strftime('%Y%m%d'), SmoothDays)
+    filename_global = 'epidemic-%s-%dDsmoothy-Global.xlsx'%(date.today().strftime('%Y%m%d'), SmoothDays)
+else:
+    filename_china  = 'epidemic-%s-China.xlsx'%(date.today().strftime('%Y%m%d'))
+    filename_global = 'epidemic-%s-Global.xlsx'%(date.today().strftime('%Y%m%d'))
+
+
+QueryWorldDataUrl ='https://i.snssdk.com/forum/ncov_data/?data_type=[2,4,8]'
 print('Fetching Global and China data ... ', end='', flush=True)
 
 r = requests.get(url=QueryWorldDataUrl)
@@ -337,11 +346,12 @@ try:
 
     SaveJson(WorldDict, 'World')
 
+
     ##############################################################################################
     # Save data of Chinese Provinces
     ##############################################################################################
-    #WorkBookChina = CreateWorkbook('epidemic-%s-China.xlsx'%(date.today().strftime('%Y%m%d')))
-    WorkBookChina = CreateWorkbook('epidemic-China.xlsx')
+
+    WorkBookChina = CreateWorkbook(filename_china)
     Provinces = WorldDict['ncov_nation_data']['provinces']
     AddToSheet(WorkBook=WorkBookChina, SheetName='全国',  Series = WorldDict['ncov_nation_data']['nationwide'])
     for Province in Provinces:
@@ -354,8 +364,7 @@ try:
     ##############################################################################################
     # Save data of World and China
     ##############################################################################################
-    #WorkBookWorld = CreateWorkbook('epidemic-%s-Global.xlsx'%(date.today().strftime('%Y%m%d')))
-    WorkBookWorld = CreateWorkbook('epidemic-Global.xlsx')
+    WorkBookWorld = CreateWorkbook(filename_global)
     ProcessOverallToXlsx(WorkBookWorld, WorldDict['overseas_data']['country'])
 
     AddToSheet(SheetName='全球', WorkBook=WorkBookWorld,  Series = WorldDict['overseas_data']['series'])
