@@ -19,6 +19,11 @@ ToSaveJson      = False
 
 TempDir=os.path.join(tempfile.gettempdir(), 'covid')
 
+proxy=""  # this can override environ settings.
+#proxy="http://localhost:8081"
+os.environ["http_proxy"]  = proxy
+os.environ["https_proxy"] = proxy
+
 def ClearTempDir():
     print("Clean previous temp files ... ", end='')
     if os.path.exists(TempDir):
