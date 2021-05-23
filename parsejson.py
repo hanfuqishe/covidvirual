@@ -29,8 +29,9 @@ def FetchJSON(URL, asFile):
     print('done. ')
 
 FetchJSON(
-    URL    = 
+    URL    = "https://is.snssdk.com/forum/ncov_data/?city_code=%5B%22420000%22%5D&data_type=%5B2%5D&src_type=province"
     # "https://i.snssdk.com/forum/ncov_data/?activeWidget=20&city_name=%E4%B8%8A%E6%B5%B7&data_type=%5B2%2C4%2C8%5D&src_type=map",
-    'https://i.snssdk.com/forum/ncov_data/?country_id=["USA"]&country_name=美国&click_from=overseas_epidemic_tab_list&data_type=[5,4]&policy_scene=USA&src_type=country',
+    # 'https://i.snssdk.com/forum/ncov_data/?country_id=["USA"]&country_name=美国&click_from=overseas_epidemic_tab_list&data_type=[5,4]&policy_scene=USA&src_type=country',
+    ,
     asFile = 'Province.json' 
 )

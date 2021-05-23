@@ -220,6 +220,7 @@ def ProcessOverallToXlsx(WorkBook, CountriesData):
     AsString   = WorkBook.add_format({'font_name': 'calibri', })
     AsPercent1 = WorkBook.add_format({'font_name': 'calibri', 'num_format': '0.0%'})
     AsPercent2 = WorkBook.add_format({'font_name': 'calibri', 'num_format': '0.00%'})
+    AsPercent3 = WorkBook.add_format({'font_name': 'calibri', 'num_format': '0.0000%'})
     AsNumber   = WorkBook.add_format({'font_name': 'calibri', 'num_format': '#,##0_ '})
 
     WorkSheet = WorkBook.add_worksheet('总览')
@@ -248,17 +249,18 @@ def ProcessOverallToXlsx(WorkBook, CountriesData):
         Col += 1; WorkSheet.write    (DestRow, Col,       Country['countryIncr']['deathsIncr'], AsNumber)
         Col += 1; WorkSheet.write    (DestRow, Col,       Country['countryIncr']['treatingIncr'], AsNumber)
         Col += 1; WorkSheet.write    (DestRow, Col, float(Country['confirmedPerMil'])/1000000, AsPercent1)
-        Col += 1; WorkSheet.write    (DestRow, Col, '=F%d/(F%d+G%d)' % (DestRow + 1, DestRow + 1, DestRow + 1), AsPercent1)   # 总治愈率
-        Col += 1; WorkSheet.write    (DestRow, Col, '=1-S%d'         % (DestRow + 1), AsPercent2)                             # 总死亡率
-        Col += 1; WorkSheet.write    (DestRow, Col, '=D%d/R%d'       % (DestRow +1, DestRow + 1), AsNumber)                  # 国民总人口
-        Col += 1; WorkSheet.write    (DestRow, Col, '=K%d*R%d'       % (DestRow +1, DestRow + 1), AsPercent2)                # 国民死亡率
+        Col += 1; WorkSheet.write    (DestRow, Col, '=F%d/(F%d+G%d)'       % (DestRow + 1, DestRow + 1, DestRow + 1), AsPercent1)   # 总治愈率
+        Col += 1; WorkSheet.write    (DestRow, Col, '=1-S%d'               % (DestRow + 1), AsPercent2)                             # 总死亡率
+        Col += 1; WorkSheet.write    (DestRow, Col, '=IFERROR(D%d/R%d,"")' % (DestRow + 1, DestRow + 1), AsNumber)                  # 国民总人口
+        Col += 1; WorkSheet.write    (DestRow, Col, '=K%d*R%d'             % (DestRow + 1, DestRow + 1), AsPercent2)                # 国民死亡率
+        Col += 1; WorkSheet.write    (DestRow, Col, '=IFERROR(M%d/U%d,"")' % (DestRow + 1, DestRow + 1), AsPercent3)                # 新增率
 
         Col += 1; WorkSheet.write(DestRow, Col, time.strftime('%Y-%m-%d', time.localtime(Country['updateTime'])), AsDate)
 
         DestRow += 1 
 
     WorkSheet.add_table(
-            "A1:W%d"%(DestRow),  {
+            "A1:%c%d"%(chr(ord('A')+ Col), DestRow),  {
                 'header_row': True, 'autofilter': True,  'style': 'TableStyleMedium3',
                 'columns': [
                         {'header': '大洲'},                 # t 
@@ -283,6 +285,7 @@ def ProcessOverallToXlsx(WorkBook, CountriesData):
                         {'header': '患者死亡率'},           # s 
                         {'header': '国民总人口'},           # t 
                         {'header': '国民死亡率'},           # u 
+                        {'header': '新增率'},           # u 
                         {'header': '更新时间'},             # v
                     ]
             }
@@ -290,19 +293,22 @@ def ProcessOverallToXlsx(WorkBook, CountriesData):
     
 
 def print_usage():
-    print('covidspider.py [-c] [-d] [-g]')
+    print('covidspider.py [-c] [-d] [-g] [-j]')
     print('    -a days\tAverage days. Smooth the comfirmed number by several days.')
     print('    -c\t\tOpen epidemic xlsx file of China automaticlly after finished.')
+    print('    -d\t\tDebug mode. Only fetch data of the first country.')
     print('    -g\t\tOpen epidemic xlsx file of Global automaticlly after finished.')
+    print('    -j\t\tSave data file in JSON file.')
 
 # Entry starts here
 
 try:
     argv = sys.argv[1:]
-    opts, args = getopt.getopt(argv,"a:hcdg")
+    opts, args = getopt.getopt(argv,"a:hcdgj")
 except getopt.GetoptError:
     print_usage()
     sys.exit(2)
+
 for opt, arg in opts:
     if opt == '-h':
         print_usage()
@@ -313,6 +319,8 @@ for opt, arg in opts:
         AutoOpenGlobal = True
     elif opt == '-d':
         Debugging = True
+    elif opt == '-j':
+        ToSaveJson = True
     elif opt == '-a':
         SmoothDays = int(arg)
         if SmoothDays < 1:
@@ -391,4 +399,4 @@ try:
     
 except:
     print("The returned data is not as expected. ")
-    #raise
+    raise
